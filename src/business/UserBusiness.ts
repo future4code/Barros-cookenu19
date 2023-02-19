@@ -1,9 +1,11 @@
 import { UserDatabase } from "../data/UserDatabase";
 import {
   CustomError,
+  EmptyList,
   InvalidEmail,
   InvalidName,
   InvalidPassword,
+  MissingUserToken,
   Unauthorized,
   UserNotFound,
 } from "../error/customError";
@@ -15,6 +17,7 @@ import {
   LoginInputDTO,
   ProfileUserInputDTO,
   ProfileUserInput,
+  TokenInputDTO,
 } from "../model/user";
 import { HashManager } from "../services/HashManager";
 import { IdGenerator } from "../services/IdGenerator";
@@ -150,4 +153,25 @@ export class UserBusiness {
       throw new CustomError(400, error.message);
     }
   };
+
+  public getAllUsers = async (input: TokenInputDTO): Promise<user[]> => {
+    try {
+        if(!input.token){
+            throw new MissingUserToken()
+        }
+
+        const users = await userDatabase.getAllUsers()
+
+        if(users.length < 1){
+            throw new EmptyList()
+        }
+
+        tokenGenerator.tokenData(input.token)
+
+        return await userDatabase.getAllUsers()
+    } catch (err: any) {
+        throw new CustomError(err.statusCode, err.message)
+    }
+}
+
 }

@@ -56,4 +56,9 @@ export class UserDatabase extends BaseDatabase {
       throw new CustomError(400, error.message);
     }
   };
+
+  getAllUsers = async () => {
+    const users = await UserDatabase.connection(this.db).select("*")
+    return users
+}
 }
