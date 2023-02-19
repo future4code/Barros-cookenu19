@@ -1,9 +1,13 @@
 import { Request, Response } from "express";
 import { UserBusiness } from "../business/UserBusiness";
-import { EditUserInputDTO, LoginInputDTO, ProfileUserInputDTO, UserInputDTO } from "../model/user";
+import { CustomError, EmptyList, MissingUserToken } from "../error/customError";
+import { EditUserInputDTO, LoginInputDTO, ProfileUserInputDTO, TokenInputDTO, user, UserInputDTO } from "../model/user";
+import { TokenGenerator } from "../services/TokenGenerator";
 
 export class UserController {
   userBusiness = new UserBusiness()
+  tokenGenerator = new TokenGenerator()
+
       public signup = async (req: Request, res: Response) => {
         try {
           const { name, nickname, email, password } = req.body;
@@ -75,7 +79,22 @@ export class UserController {
         } catch (error: any) {
           res.status(400).send(error.message);
         }
+        
       }; 
+
+      getAllUsers = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const input: TokenInputDTO = {
+                token: req.headers.authorization as string
+            }
+
+            const users = await this.userBusiness.getAllUsers(input)
+
+            res.status(200).send(users)            
+        } catch (err: any) {
+            res.status(err.statusCode || 400).send(err.message || err.sqlMessage) 
+        }
+    }
 
       
  

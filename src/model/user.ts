@@ -39,3 +39,7 @@ export interface ProfileUserInputDTO {
 export interface ProfileUserInput {
    id: string
 }
+
+export interface TokenInputDTO {
+   token: string
+}
